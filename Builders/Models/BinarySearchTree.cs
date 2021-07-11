@@ -1,7 +1,14 @@
+using System.Text.Json.Serialization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace Builders.Models
 {
     public class BinarySearchTree
-    {
+    {        
+        [JsonIgnore]
+        [BsonId]
+        public ObjectId Id {get;set;}
         public Node root { get; private set; }
 
         public void AddNode(int value)
