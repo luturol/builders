@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Builders.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,18 @@ namespace Builders.Controllers
             Node n2 = new Node { Value = 2, Left = n1, Right = n3 };
 
             return Ok(n2.FindWithValue(2));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Post(List<int> values)
+        {
+            var bst = new BinarySearchTree();
+            foreach(int value in values)
+            {
+                bst.AddNode(value);
+            }
+
+            return Ok(bst);
         }
     }
 }
