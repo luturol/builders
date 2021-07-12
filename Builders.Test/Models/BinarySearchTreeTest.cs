@@ -17,7 +17,7 @@ namespace Builders.Test.Models
             #endregion Arrange
 
             #region Act
-            var rightNode = bst.root.Right;
+            var rightNode = bst.Root.Right;
             #endregion Act
 
             #region Assert
@@ -38,7 +38,7 @@ namespace Builders.Test.Models
             #endregion Arrange
 
             #region Act
-            var leftNode = bst.root.Left;
+            var leftNode = bst.Root.Left;
             #endregion Act
 
             #region Assert
@@ -57,7 +57,7 @@ namespace Builders.Test.Models
             #endregion Arrange
 
             #region Act
-            var rootNode = bst.root;
+            var rootNode = bst.Root;
             #endregion Act
 
             #region Assert

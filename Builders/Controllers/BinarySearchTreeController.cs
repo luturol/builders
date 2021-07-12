@@ -21,10 +21,26 @@ namespace Builders.Controllers
             this.repository = repository;
         }
 
-        [HttpGet("{value}")]
-        public async Task<ActionResult> Get(int value)
+        [HttpGet("{id}")]
+        public async Task<ActionResult> Get(string id)
         {
-            var tree = await repository.GetBinarySearchTree();
+            var tree = await repository.GetBinarySearchTree(id);
+            if (tree is null)
+            {
+                logger.LogInformation("No tree found with giving id {id}", id);
+                return NoContent();
+            }
+            else
+            {                
+                return Ok(tree);
+            }
+
+        }
+
+        [HttpGet("{id}/{value}")]
+        public async Task<ActionResult> FindNodeInSideTree(string id, int value)
+        {
+            var tree = await repository.GetBinarySearchTree(id);
             logger.LogInformation("Got the first tree", tree);
             if (tree is null)
             {
@@ -32,14 +48,28 @@ namespace Builders.Controllers
             }
             else
             {
-                return Ok(tree.root?.FindWithValue(value));
+                return Ok(tree.Root?.FindWithValue(value));
             }
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(List<int> values)
         {
-            var tree = await repository.GetBinarySearchTree();
+            logger.LogInformation("Create a bst and insert into MongoDb");
+            var bst = new BinarySearchTree();
+            foreach (int value in values)
+            {
+                bst.AddNode(value);
+            }
+
+            await repository.AddBinarySearchTree(bst);
+            return Ok(bst);
+        }
+
+        [HttpPatch]
+        public async Task<ActionResult> Patch(string id, List<int> values)
+        {
+            var tree = await repository.GetBinarySearchTree(id);
             logger.LogInformation("Got the tree and will add another values to it with tree is not null", tree);
             if (tree is not null)
             {
@@ -53,18 +83,8 @@ namespace Builders.Controllers
 
                 return Ok(tree);
             }
-            else
-            {
-                logger.LogInformation("Not found a tree, now will create one and insert into MongoDb");
-                var bst = new BinarySearchTree();
-                foreach (int value in values)
-                {
-                    bst.AddNode(value);
-                }
 
-                await repository.AddBinarySearchTree(bst);
-                return Ok(bst);
-            }
+            return NoContent();
         }
     }
 }

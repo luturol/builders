@@ -22,9 +22,10 @@ namespace Builders.Repository
             await collection.InsertOneAsync(bst);
         }
 
-        public async Task<BinarySearchTree> GetBinarySearchTree()
+        public async Task<BinarySearchTree> GetBinarySearchTree(string id)
         {
-            var tree = await collection.Find(new BsonDocument()).FirstOrDefaultAsync();
+            var filter = Builders<BinarySearchTree>.Filter.Eq(bst => bst.Id, id);
+            var tree = await collection.Find(filter).FirstOrDefaultAsync();
 
             return tree;
         }
