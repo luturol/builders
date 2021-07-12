@@ -152,9 +152,12 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToGetSimplifiedBstGivingBstWithOneNode()
         {
             #region Arrange
+            var expectedNodes = new List<int> { 1 };
+            
             var bst = new BinarySearchTree();
-            bst.AddNode(1);
-            var expected = new List<int> { 1 };
+            bst.AddNode(expectedNodes);
+
+            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
             #endregion Arrange
 
             #region Act
@@ -162,7 +165,7 @@ namespace Builders.Test.Models
             #endregion Act
 
             #region Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(expectedSimplified, actual);
             #endregion Assert
         }
 
@@ -170,9 +173,11 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToGetSimplifiedBstGivingBstWithMoreThanOneChildNode()
         {
             #region Arrange
-            var expected = new List<int> { 1, 3, 2, 5, 4, 6, 7, 8 };
+            var expectedNodes = new List<int> { 1, 3, 2, 5, 4, 6, 7, 8 };
+            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
+
             var bst = new BinarySearchTree();
-            bst.AddNode(expected);
+            bst.AddNode(expectedNodes);
 
             #endregion Arrange
 
@@ -181,7 +186,7 @@ namespace Builders.Test.Models
             #endregion Act
 
             #region Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(expectedSimplified, actual);
             #endregion Assert
         }
 
@@ -189,10 +194,11 @@ namespace Builders.Test.Models
         public void ShouldBeAbletToGetSimplifiedBstGivingEmptyBst()
         {
             #region Arrange
-            var expected = new List<int>();
+            var expectedNodes = new List<int>();
             var bst = new BinarySearchTree();
-            bst.AddNode(expected);
+            bst.AddNode(expectedNodes);
 
+            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
             #endregion Arrange
 
             #region Act
@@ -200,7 +206,7 @@ namespace Builders.Test.Models
             #endregion Act
 
             #region Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(expectedSimplified, actual);
             #endregion Assert
         }
         #endregion Get Simplified Bst Test Methods

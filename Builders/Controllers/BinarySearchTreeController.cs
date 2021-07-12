@@ -40,15 +40,18 @@ namespace Builders.Controllers
         [HttpGet("{id}/{value}")]
         public async Task<ActionResult> FindNodeInSideTree(string id, int value)
         {
-            var tree = await repository.GetBinarySearchTree(id);
-            logger.LogInformation("Got the first tree", tree);
-            if (tree is null)
+            var treeSimplified = await repository.GetBinarySearchTree(id);
+            logger.LogInformation("Got the first tree {treeSimplified}", treeSimplified);
+            if (treeSimplified is null)
             {
                 return NoContent();
             }
             else
             {
-                return Ok(tree.FindWithValue(value));
+                var bst = new BinarySearchTree();
+                bst.AddNode(treeSimplified.Nodes);
+
+                return Ok(bst.FindWithValue(value));
             }
         }
 
@@ -62,26 +65,28 @@ namespace Builders.Controllers
                 bst.AddNode(value);
             }
 
-            await repository.AddBinarySearchTree(bst);
+            await repository.AddBinarySearchTree(bst.GetSimplifiedBst());
             return Ok(bst);
         }
 
         [HttpPatch]
         public async Task<ActionResult> Patch(string id, List<int> values)
         {
-            var tree = await repository.GetBinarySearchTree(id);
-            logger.LogInformation("Got the tree and will add another values to it with tree is not null", tree);
-            if (tree is not null)
+            var treeSimplified = await repository.GetBinarySearchTree(id);
+            logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
+            if (treeSimplified is not null)
             {
-                foreach (int value in values)
-                {
-                    tree.AddNode(value);
-                }
+                var bst = new BinarySearchTree();
+                bst.AddNode(treeSimplified.Nodes);
+                bst.AddNode(values);
 
-                await repository.UpdateBinarySearchTree(tree);
-                logger.LogInformation("Updated Tree", tree);
+                var updatedBst = bst.GetSimplifiedBst();
+                treeSimplified.Nodes = updatedBst.Nodes;
+                
+                await repository.UpdateBinarySearchTree(treeSimplified);
+                logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
 
-                return Ok(tree);
+                return Ok(treeSimplified);
             }
 
             return NoContent();

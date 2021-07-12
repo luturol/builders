@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Builders.Interfaces;
 using Builders.Models;
@@ -8,31 +9,31 @@ namespace Builders.Repository
 {
     public class BinarySearchTreeRepository : IBinarySearchTreeRepository
     {
-        private IMongoCollection<BinarySearchTree> collection;
+        private IMongoCollection<SimplifiedBinarySearchTree> collection;
 
         public BinarySearchTreeRepository(IMongoDbSettings settings)
         {            
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.Database);
-            collection = database.GetCollection<BinarySearchTree>(settings.Collection);
+            collection = database.GetCollection<SimplifiedBinarySearchTree>(settings.Collection);
         }
 
-        public async Task AddBinarySearchTree(BinarySearchTree bst)
+        public async Task AddBinarySearchTree(SimplifiedBinarySearchTree simplifiedBst)
         {
-            await collection.InsertOneAsync(bst);
+            await collection.InsertOneAsync(simplifiedBst);
         }
 
-        public async Task<BinarySearchTree> GetBinarySearchTree(string id)
+        public async Task<SimplifiedBinarySearchTree> GetBinarySearchTree(string id)
         {
-            var filter = Builders<BinarySearchTree>.Filter.Eq(bst => bst.Id, id);
+            var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(bst => bst.Id, id);
             var tree = await collection.Find(filter).FirstOrDefaultAsync();
 
             return tree;
         }
 
-        public async Task UpdateBinarySearchTree(BinarySearchTree bst)
+        public async Task UpdateBinarySearchTree(SimplifiedBinarySearchTree bst)
         {
-            var filter = Builders<BinarySearchTree>.Filter.Eq(e => e.Id, bst.Id);
+            var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, bst.Id);
 
             await collection.ReplaceOneAsync(filter, bst);            
         }

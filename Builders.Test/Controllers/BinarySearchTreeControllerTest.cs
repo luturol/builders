@@ -28,13 +28,15 @@ namespace Builders.Test.Controllers
 
             #region Act
             var response = await client.GetAsync("BinarySearchTree/60ec7faf0f030a719662a8f9");
+            
+            var actualBst = JsonConvert.DeserializeObject<BinarySearchTree>(await response.Content.ReadAsStringAsync());
             #endregion Act
 
             #region Assert
             response.EnsureSuccessStatusCode();
-            var bst = JsonConvert.DeserializeObject<BinarySearchTree>(await response.Content.ReadAsStringAsync());
+            
 
-            Assert.Equal(new BinarySearchTree(), bst);
+            Assert.Equal(new BinarySearchTree(), actualBst);
             Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
             #endregion Assert
         }
@@ -51,23 +53,23 @@ namespace Builders.Test.Controllers
             var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
 
             var expectedBst = new BinarySearchTree();
-            expectedBst.AddNode(8);
-            expectedBst.AddNode(5);
-            expectedBst.AddNode(6);
-            expectedBst.AddNode(7);            
-            expectedBst.AddNode(9);
-            expectedBst.AddNode(10);
+            expectedBst.AddNode(nodes);
+
+            var expectedSimplified = expectedBst.GetSimplifiedBst();
             #endregion Arrange
 
             #region Act
-            var response = await client.PostAsync("BinarySearchTree/", httpContent);
+            var response = await client.PostAsync("BinarySearchTree/", httpContent);                    
+
+            var json = await response.Content.ReadAsStringAsync();
+            var actualBst = JsonConvert.DeserializeObject<BinarySearchTree>(json);
+            var actualSimplified = actualBst.GetSimplifiedBst();
             #endregion Act
 
-            #region Assert
+            #region Assert            
             response.EnsureSuccessStatusCode();
-            var bst = JsonConvert.DeserializeObject<BinarySearchTree>(await response.Content.ReadAsStringAsync());
 
-            Assert.Equal(expectedBst, bst);
+            Assert.Equal(expectedSimplified, actualSimplified);
             Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
             #endregion Assert
         }

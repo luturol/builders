@@ -8,9 +8,6 @@ namespace Builders.Models
 {
     public class BinarySearchTree
     {
-        [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         public Node Root { get; private set; }
 
         public void AddNode(int value)
@@ -70,17 +67,17 @@ namespace Builders.Models
             }
         }
 
-        public List<int> GetSimplifiedBst()
+        public SimplifiedBinarySearchTree GetSimplifiedBst()
         {
             List<int> nodes = new List<int>();
             GetSimplifiedBstRecursive(nodes, Root);
 
-            return nodes;
-        }   
+            return new SimplifiedBinarySearchTree { Nodes = nodes };
+        }
 
         private void GetSimplifiedBstRecursive(List<int> nodes, Node node)
         {
-            if(node is null) return;
+            if (node is null) return;
 
             nodes.Add(node.Value);
 
