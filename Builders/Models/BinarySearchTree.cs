@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -11,9 +12,18 @@ namespace Builders.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public Node Root { get; private set; }
+
         public void AddNode(int value)
         {
             Root = AddNodeRecursive(Root, value);
+        }
+
+        public void AddNode(List<int> values)
+        {
+            foreach (int node in values)
+            {
+                AddNode(node);
+            }
         }
 
         private Node AddNodeRecursive(Node node, int value)
@@ -58,6 +68,24 @@ namespace Builders.Models
             {
                 return FindWithValueRecursive(node.Left, value);
             }
+        }
+
+        public List<int> GetSimplifiedBst()
+        {
+            List<int> nodes = new List<int>();
+            GetSimplifiedBstRecursive(nodes, Root);
+
+            return nodes;
+        }   
+
+        private void GetSimplifiedBstRecursive(List<int> nodes, Node node)
+        {
+            if(node is null) return;
+
+            nodes.Add(node.Value);
+
+            GetSimplifiedBstRecursive(nodes, node.Left);
+            GetSimplifiedBstRecursive(nodes, node.Right);
         }
     }
 }
