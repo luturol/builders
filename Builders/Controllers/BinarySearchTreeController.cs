@@ -48,7 +48,7 @@ namespace Builders.Controllers
             }
             else
             {
-                return Ok(tree.Root?.FindWithValue(value));
+                return Ok(tree.FindWithValue(value));
             }
         }
 

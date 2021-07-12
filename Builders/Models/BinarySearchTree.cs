@@ -7,16 +7,16 @@ namespace Builders.Models
 {
     public class BinarySearchTree
     {
-        [BsonId(IdGenerator = typeof(StringObjectIdGenerator))] 
+        [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }        
+        public string Id { get; set; }
         public Node Root { get; private set; }
         public void AddNode(int value)
         {
-            Root = AddNode0(Root, value);
+            Root = AddNodeRecursive(Root, value);
         }
 
-        private Node AddNode0(Node node, int value)
+        private Node AddNodeRecursive(Node node, int value)
         {
             if (node == null)
             {
@@ -25,14 +25,39 @@ namespace Builders.Models
             }
             else if (node.Value > value)
             {
-                node.Left = AddNode0(node.Left, value);
+                node.Left = AddNodeRecursive(node.Left, value);
             }
             else if (node.Value < value)
             {
-                node.Right = AddNode0(node.Right, value);
+                node.Right = AddNodeRecursive(node.Right, value);
             }
 
             return node;
+        }
+
+        public Node FindWithValue(int value)
+        {
+            return FindWithValueRecursive(Root, value);
+        }
+
+        private Node FindWithValueRecursive(Node node, int value)
+        {
+            if (node is null)
+            {
+                return null;
+            }
+            else if (value == node.Value)
+            {
+                return node;
+            }
+            else if (value > node.Value)
+            {
+                return FindWithValueRecursive(node.Right, value);
+            }
+            else
+            {
+                return FindWithValueRecursive(node.Left, value);
+            }
         }
     }
 }

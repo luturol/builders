@@ -47,6 +47,7 @@ namespace Builders.Test.Models
             #endregion Assert
         }
 
+        [Fact]
         public void ShouldBeAbleToAddInTheRootPositionGivingRootIsNull()
         {
             #region Arrange
@@ -63,6 +64,69 @@ namespace Builders.Test.Models
             #region Assert
             Assert.NotNull(rootNode);
             Assert.Equal(rootNode.Value, expectedValue);
+            #endregion Assert
+        }
+
+        [Fact]
+        public void ShouldBeAbleToFindNodeThatHasGivingValue()
+        {
+            #region Arrange
+            BinarySearchTree bst = new BinarySearchTree();
+            bst.AddNode(1);
+            bst.AddNode(3);
+            bst.AddNode(2);
+
+            var expectedValue = 3;
+            #endregion Arrange
+
+            #region Act
+            var actualNode = bst.FindWithValue(expectedValue);
+            var actualValue = actualNode.Value;
+            #endregion
+
+            #region Assert            
+            Assert.Equal(expectedValue, actualValue);
+            #endregion Assert
+        }
+
+        [Fact]
+        public void ShouldBeAbleToFindRootNodeThatHasGivingValue()
+        {
+            #region Arrange
+            BinarySearchTree bst = new BinarySearchTree();
+            bst.AddNode(1);
+            bst.AddNode(3);
+            bst.AddNode(2);
+
+            var expectedValue = 2;
+            #endregion Arrange
+
+            #region Act
+            var actualNode = bst.FindWithValue(2);
+            var actualValue = actualNode.Value;
+            #endregion
+
+            #region Assert
+            Assert.Equal(expectedValue, actualValue);
+            #endregion Assert
+        }
+
+        [Fact]
+        public void ShouldBeAbleToReturnNullWithDoesNotFoundNodeWithGivingValue()
+        {
+            #region Arrange
+            BinarySearchTree bst = new BinarySearchTree();
+            bst.AddNode(1);
+            bst.AddNode(3);
+            bst.AddNode(2);
+            #endregion Arrange
+
+            #region Act
+            var actual = bst.FindWithValue(0);
+            #endregion
+
+            #region Assert
+            Assert.Null(actual);
             #endregion Assert
         }
     }
