@@ -55,7 +55,7 @@ namespace Builders.Test.Controllers
             var expectedBst = new BinarySearchTree();
             expectedBst.AddNode(nodes);
 
-            var expectedSimplified = expectedBst.GetSimplifiedBst();
+            var expectedSimplified = expectedBst.GetSimplifiedBinarySearchTree();
             #endregion Arrange
 
             #region Act
@@ -63,7 +63,7 @@ namespace Builders.Test.Controllers
 
             var json = await response.Content.ReadAsStringAsync();
             var actualBst = JsonConvert.DeserializeObject<BinarySearchTree>(json);
-            var actualSimplified = actualBst.GetSimplifiedBst();
+            var actualSimplified = actualBst.GetSimplifiedBinarySearchTree();
             #endregion Act
 
             #region Assert            

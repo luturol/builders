@@ -153,19 +153,17 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var expectedNodes = new List<int> { 1 };
-            
+
             var bst = new BinarySearchTree();
             bst.AddNode(expectedNodes);
-
-            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
             #endregion Arrange
 
             #region Act
-            var actual = bst.GetSimplifiedBst();
+            var actual = bst.GetSimplifiedBinarySearchTree();
             #endregion Act
 
             #region Assert
-            Assert.Equal(expectedSimplified, actual);
+            Assert.Equal(expectedNodes, actual);
             #endregion Assert
         }
 
@@ -174,19 +172,17 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var expectedNodes = new List<int> { 1, 3, 2, 5, 4, 6, 7, 8 };
-            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
-
             var bst = new BinarySearchTree();
             bst.AddNode(expectedNodes);
 
             #endregion Arrange
 
             #region Act
-            var actual = bst.GetSimplifiedBst();
+            var actual = bst.GetSimplifiedBinarySearchTree();
             #endregion Act
 
             #region Assert
-            Assert.Equal(expectedSimplified, actual);
+            Assert.Equal(expectedNodes, actual);
             #endregion Assert
         }
 
@@ -197,18 +193,58 @@ namespace Builders.Test.Models
             var expectedNodes = new List<int>();
             var bst = new BinarySearchTree();
             bst.AddNode(expectedNodes);
-
-            var expectedSimplified = new SimplifiedBinarySearchTree { Nodes = expectedNodes };
             #endregion Arrange
 
             #region Act
-            var actual = bst.GetSimplifiedBst();
+            var actual = bst.GetSimplifiedBinarySearchTree();
             #endregion Act
 
             #region Assert
-            Assert.Equal(expectedSimplified, actual);
+            Assert.Equal(expectedNodes, actual);
             #endregion Assert
         }
         #endregion Get Simplified Bst Test Methods
+
+        #region Is BST Test Methods
+        [Fact]
+        public void ShouldBeAbleToCheckIfIsBstGivingAValidBst()
+        {
+            #region Arrange
+            var nodes = new List<int> { 1, 3, 4, 5, 2 };
+            var bst = new BinarySearchTree();
+            bst.AddNode(nodes);
+            #endregion Arrange
+
+            #region Act
+            var actual = bst.IsBst();
+            #endregion Act
+
+            #region Assert
+            Assert.True(actual);
+            #endregion Assert
+        }
+
+        [Fact]
+        public void ShouldBeAbleToCheckIfIsNotBstGivingInvalidBst()
+        {
+            #region Arrange
+            var nodes = new List<int> { 1, 3, 4, 5, 2 };
+            var bst = new BinarySearchTree();
+            bst.AddNode(nodes);
+
+            var tempR = new Node { Value = bst.Root.Right.Value, Right = bst.Root.Right.Right, Left = bst.Root.Right.Left };
+            bst.Root.Right = bst.Root.Left;
+            bst.Root.Left = tempR;
+            #endregion Arrange
+
+            #region Act
+            var actual = bst.IsBst();
+            #endregion Act
+
+            #region Assert
+            Assert.False(actual);
+            #endregion Assert
+        }
+        #endregion
     }
 }

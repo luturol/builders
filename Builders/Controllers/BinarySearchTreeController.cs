@@ -31,7 +31,7 @@ namespace Builders.Controllers
                 return NoContent();
             }
             else
-            {                
+            {
                 return Ok(tree);
             }
 
@@ -65,7 +65,8 @@ namespace Builders.Controllers
                 bst.AddNode(value);
             }
 
-            await repository.AddBinarySearchTree(bst.GetSimplifiedBst());
+            var simplifiedBst = new SimplifiedBinarySearchTree { Nodes = bst.GetSimplifiedBinarySearchTree() };
+            await repository.AddBinarySearchTree(simplifiedBst);
             return Ok(bst);
         }
 
@@ -80,9 +81,9 @@ namespace Builders.Controllers
                 bst.AddNode(treeSimplified.Nodes);
                 bst.AddNode(values);
 
-                var updatedBst = bst.GetSimplifiedBst();
-                treeSimplified.Nodes = updatedBst.Nodes;
-                
+                var simplifiedBst = bst.GetSimplifiedBinarySearchTree();
+                treeSimplified.Nodes = simplifiedBst;
+
                 await repository.UpdateBinarySearchTree(treeSimplified);
                 logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
 

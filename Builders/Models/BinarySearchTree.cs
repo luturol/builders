@@ -67,12 +67,12 @@ namespace Builders.Models
             }
         }
 
-        public SimplifiedBinarySearchTree GetSimplifiedBst()
+        public List<int> GetSimplifiedBinarySearchTree()
         {
             List<int> nodes = new List<int>();
             GetSimplifiedBstRecursive(nodes, Root);
 
-            return new SimplifiedBinarySearchTree { Nodes = nodes };
+            return nodes;
         }
 
         private void GetSimplifiedBstRecursive(List<int> nodes, Node node)
@@ -83,6 +83,43 @@ namespace Builders.Models
 
             GetSimplifiedBstRecursive(nodes, node.Left);
             GetSimplifiedBstRecursive(nodes, node.Right);
+        }
+
+        public bool IsBst()
+        {
+            return IsBstRecursive(Root);
+        }
+
+        private bool IsBstRecursive(Node node)
+        {
+            if(node == null)
+            {
+                return true;
+            }
+
+            var minValue = GetMinLeftRecursive(node);
+            var maxValue = GetMaxRightRecursive(node);
+
+            if(node.Value < minValue || node.Value > maxValue)
+                return false;
+            
+            return IsBstRecursive(node.Left) && IsBstRecursive(node.Right);            
+        }   
+
+        private int GetMinLeftRecursive(Node node)
+        {
+            if (node.Left is null)
+                return node.Value;
+            else
+                return GetMinLeftRecursive(node.Left);
+        }
+
+        private int GetMaxRightRecursive(Node node)
+        {
+            if(node.Right is null)
+                return node.Value;
+            else
+                return GetMaxRightRecursive(node.Right);
         }
     }
 }
