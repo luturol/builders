@@ -23,9 +23,7 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToAddInTheRightPositionOfTreeRootGivingValueBiggerThanTheRootValue()
         {
             #region Arrange
-            var bst = new BinarySearchTree();
-            bst.AddNode(1);
-            bst.AddNode(2);
+            var bst = new BinarySearchTree(new List<int> { 1, 2});            
 
             var expectedValue = 2;
             #endregion Arrange
@@ -37,6 +35,7 @@ namespace Builders.Test.Models
             #region Assert
             Assert.NotNull(rightNode);
             Assert.Equal(rightNode.Value, expectedValue);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -44,10 +43,8 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToAddInTheLeftPositionOfTreeRootGivingValueLesThanTheRootValue()
         {
             #region Arrange
-            var bst = new BinarySearchTree();
-            bst.AddNode(3);
-            bst.AddNode(2);
-
+            var bst = new BinarySearchTree(new List<int> { 3, 2 });
+            
             var expectedValue = 2;
             #endregion Arrange
 
@@ -58,6 +55,7 @@ namespace Builders.Test.Models
             #region Assert
             Assert.NotNull(leftNode);
             Assert.Equal(leftNode.Value, expectedValue);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -65,9 +63,7 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToAddInTheRootPositionGivingRootIsNull()
         {
             #region Arrange
-            var bst = new BinarySearchTree();
-            bst.AddNode(3);
-
+            var bst = new BinarySearchTree(new List<int> { 3 });            
             var expectedValue = 3;
             #endregion Arrange
 
@@ -78,6 +74,7 @@ namespace Builders.Test.Models
             #region Assert
             Assert.NotNull(rootNode);
             Assert.Equal(rootNode.Value, expectedValue);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
         #endregion Add Node Test Methods
@@ -87,11 +84,7 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToFindNodeThatHasGivingValue()
         {
             #region Arrange
-            BinarySearchTree bst = new BinarySearchTree();
-            bst.AddNode(1);
-            bst.AddNode(3);
-            bst.AddNode(2);
-
+            BinarySearchTree bst = new BinarySearchTree(new List<int> { 1, 3, 2});            
             var expectedValue = 3;
             #endregion Arrange
 
@@ -102,6 +95,7 @@ namespace Builders.Test.Models
 
             #region Assert            
             Assert.Equal(expectedValue, actualValue);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -109,11 +103,7 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToFindRootNodeThatHasGivingValue()
         {
             #region Arrange
-            BinarySearchTree bst = new BinarySearchTree();
-            bst.AddNode(1);
-            bst.AddNode(3);
-            bst.AddNode(2);
-
+            BinarySearchTree bst = new BinarySearchTree(new List<int> { 1, 3, 2});            
             var expectedValue = 2;
             #endregion Arrange
 
@@ -124,6 +114,7 @@ namespace Builders.Test.Models
 
             #region Assert
             Assert.Equal(expectedValue, actualValue);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -131,10 +122,7 @@ namespace Builders.Test.Models
         public void ShouldBeAbleToReturnNullWithDoesNotFoundNodeWithGivingValue()
         {
             #region Arrange
-            BinarySearchTree bst = new BinarySearchTree();
-            bst.AddNode(1);
-            bst.AddNode(3);
-            bst.AddNode(2);
+            BinarySearchTree bst = new BinarySearchTree(new List<int> { 1, 3, 2});            
             #endregion Arrange
 
             #region Act
@@ -143,6 +131,7 @@ namespace Builders.Test.Models
 
             #region Assert
             Assert.Null(actual);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
         #endregion FindWithValue Test Methods
@@ -154,8 +143,7 @@ namespace Builders.Test.Models
             #region Arrange
             var expectedNodes = new List<int> { 1 };
 
-            var bst = new BinarySearchTree();
-            bst.AddNode(expectedNodes);
+            var bst = new BinarySearchTree(expectedNodes);
             #endregion Arrange
 
             #region Act
@@ -164,6 +152,7 @@ namespace Builders.Test.Models
 
             #region Assert
             Assert.Equal(expectedNodes, actual);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -172,9 +161,7 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var expectedNodes = new List<int> { 1, 3, 2, 5, 4, 6, 7, 8 };
-            var bst = new BinarySearchTree();
-            bst.AddNode(expectedNodes);
-
+            var bst = new BinarySearchTree(expectedNodes);
             #endregion Arrange
 
             #region Act
@@ -183,6 +170,7 @@ namespace Builders.Test.Models
 
             #region Assert
             Assert.Equal(expectedNodes, actual);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
 
@@ -191,8 +179,7 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var expectedNodes = new List<int>();
-            var bst = new BinarySearchTree();
-            bst.AddNode(expectedNodes);
+            var bst = new BinarySearchTree(expectedNodes);
             #endregion Arrange
 
             #region Act
@@ -201,6 +188,7 @@ namespace Builders.Test.Models
 
             #region Assert
             Assert.Equal(expectedNodes, actual);
+            Assert.True(bst.IsBst());
             #endregion Assert
         }
         #endregion Get Simplified Bst Test Methods
@@ -211,8 +199,7 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var nodes = new List<int> { 1, 3, 4, 5, 2 };
-            var bst = new BinarySearchTree();
-            bst.AddNode(nodes);
+            var bst = new BinarySearchTree(nodes);
             #endregion Arrange
 
             #region Act
@@ -229,8 +216,7 @@ namespace Builders.Test.Models
         {
             #region Arrange
             var nodes = new List<int> { 1, 3, 4, 5, 2 };
-            var bst = new BinarySearchTree();
-            bst.AddNode(nodes);
+            var bst = new BinarySearchTree(nodes);
 
             var tempR = new Node { Value = bst.Root.Right.Value, Right = bst.Root.Right.Right, Left = bst.Root.Right.Left };
             bst.Root.Right = bst.Root.Left;
@@ -242,7 +228,7 @@ namespace Builders.Test.Models
             #endregion Act
 
             #region Assert
-            Assert.False(actual);
+            Assert.False(actual);            
             #endregion Assert
         }
         #endregion

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,29 +19,48 @@ namespace Builders.Test.Controllers
             this.factory = factory;
         }
 
+        #region Get Test
         [Fact]
-        public async Task ShouldBeAbleToGetBinarySearchTreeFromMongoDbWithGivingId()
+        public async Task ShouldBeAbleToGetBinarySearchTreeFromMongoDbWithGivingValidId()
         {
             #region Arrange
             var client = factory.CreateClient();
-
+            var expectedSimplifiedBst = await AddSimplifiedBst();
             #endregion Arrange
 
             #region Act
-            var response = await client.GetAsync("BinarySearchTree/60ec7faf0f030a719662a8f9");
-            
-            var actualBst = JsonConvert.DeserializeObject<BinarySearchTree>(await response.Content.ReadAsStringAsync());
+            var response = await client.GetAsync("BinarySearchTree/" + expectedSimplifiedBst.Id);
+
+            var actualBst = JsonConvert.DeserializeObject<SimplifiedBinarySearchTree>(await response.Content.ReadAsStringAsync());
             #endregion Act
 
             #region Assert
             response.EnsureSuccessStatusCode();
-            
-
-            Assert.Equal(new BinarySearchTree(), actualBst);
-            Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
+            Assert.Equal(expectedSimplifiedBst.Id, actualBst.Id);
+            Assert.Equal(expectedSimplifiedBst.Nodes.Count, actualBst.Nodes.Count);
+            Assert.True(actualBst.Nodes.SequenceEqual(expectedSimplifiedBst.Nodes));
             #endregion Assert
         }
 
+        [Fact]
+        public async Task ShouldBeAbleToGetNoContentByGivingInvalidId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var fakeId = "60edef20784d79c6f17e2a9e";
+            #endregion Arrange
+
+            #region Act
+            var response = await client.GetAsync("BinarySearchTree/" + fakeId);
+            #endregion Act
+
+            #region Assert
+            response.EnsureSuccessStatusCode();
+            #endregion Assert
+        }
+        #endregion Get Simplified Binary Search Tree Test
+
+        #region Post
         [Fact]
         public async Task ShouldBeAbleToAddBinarySearchTreeInMongoDb()
         {
@@ -52,27 +72,70 @@ namespace Builders.Test.Controllers
 
             var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
 
-            var expectedBst = new BinarySearchTree();
-            expectedBst.AddNode(nodes);
+            var expectedBst = new BinarySearchTree(nodes);
 
             var expectedSimplified = expectedBst.GetSimplifiedBinarySearchTree();
             #endregion Arrange
 
             #region Act
-            var response = await client.PostAsync("BinarySearchTree/", httpContent);                    
+            var response = await client.PostAsync("BinarySearchTree/", httpContent);
 
             var json = await response.Content.ReadAsStringAsync();
-            var actualBst = JsonConvert.DeserializeObject<BinarySearchTree>(json);
-            var actualSimplified = actualBst.GetSimplifiedBinarySearchTree();
+            var actualSimplified = JsonConvert.DeserializeObject<SimplifiedBinarySearchTree>(json);
+            var actualBst = new BinarySearchTree(actualSimplified.Nodes);
             #endregion Act
 
             #region Assert            
             response.EnsureSuccessStatusCode();
+            Assert.True(actualSimplified.Nodes.SequenceEqual(expectedSimplified));
+            Assert.True(actualBst.IsBst());
+            #endregion Assert
+        }
+        #endregion Post
 
-            Assert.Equal(expectedSimplified, actualSimplified);
-            Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
+        #region Get Find Node by Value 
+        [Fact]
+        public async Task ShouldBeAbleToFindNodeByGivingValue()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedSimplifiedBst = await AddSimplifiedBst();
+            var bst = new BinarySearchTree(expectedSimplifiedBst.Nodes);
+            var expectedNodeValue = expectedSimplifiedBst.Nodes.First();
+            var expectedNode = bst.FindWithValue(expectedNodeValue);
+
+            #endregion Arrange
+
+            #region Act
+            var response = await client.GetAsync("BinarySearchTree/" + expectedSimplifiedBst.Id + "/" + expectedNodeValue);
+
+            var actualNode = JsonConvert.DeserializeObject<Node>(await response.Content.ReadAsStringAsync());
+            #endregion Act
+
+            #region Assert
+            response.EnsureSuccessStatusCode();
+            Assert.NotNull(actualNode);
+            Assert.Equal(expectedNodeValue, actualNode.Value);
+            Assert.Equal(expectedNode.Left, actualNode.Left);
+            Assert.Equal(expectedNode.Right, actualNode.Right);                        
             #endregion Assert
         }
 
+        #endregion
+        private async Task<SimplifiedBinarySearchTree> AddSimplifiedBst()
+        {
+            var nodes = new List<int> { 3, 2, 4, 5, 6, 7, 9, 44, 10, 1, 0 };
+
+            var client = factory.CreateClient();
+
+            var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("BinarySearchTree/", httpContent);
+            var json = await response.Content.ReadAsStringAsync();
+
+            var createdBst = JsonConvert.DeserializeObject<SimplifiedBinarySearchTree>(json);
+
+            return createdBst;
+        }
     }
 }

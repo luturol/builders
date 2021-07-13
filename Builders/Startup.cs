@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Builders.Core;
 using Builders.Interfaces;
 using Builders.Repository;
+using Builders.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -40,6 +41,7 @@ namespace Builders
             });
 
             services.AddTransient<IBinarySearchTreeRepository, BinarySearchTreeRepository>();
+            services.AddTransient<IBinarySearchTreeService, BinarySearchTreeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

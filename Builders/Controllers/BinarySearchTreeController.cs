@@ -4,7 +4,7 @@ using Builders.Models;
 using Builders.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using System;
 
 namespace Builders.Controllers
 {
@@ -24,32 +24,38 @@ namespace Builders.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(string id)
         {
-            var tree = await repository.GetBinarySearchTree(id);
-            if (tree is null)
+            try
             {
-                logger.LogInformation("No tree found with giving id {id}", id);
-                return NoContent();
+                var tree = await repository.GetSimplifiedBinarySearchTree(id);
+                if (tree is null)
+                {
+                    logger.LogInformation("No tree found with giving id {id}", id);
+                    return NoContent();
+                }
+                else
+                {
+                    return Ok(tree);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Ok(tree);
+                logger.LogInformation(ex, $"Error while trying to get tree by id { id } { ex.Message }");
+                return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
-
         }
 
         [HttpGet("{id}/{value}")]
-        public async Task<ActionResult> FindNodeInSideTree(string id, int value)
+        public async Task<ActionResult> FindNodeInsideTree(string id, int value)
         {
-            var treeSimplified = await repository.GetBinarySearchTree(id);
-            logger.LogInformation("Got the first tree {treeSimplified}", treeSimplified);
+            var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
+            logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
             if (treeSimplified is null)
             {
                 return NoContent();
             }
             else
             {
-                var bst = new BinarySearchTree();
-                bst.AddNode(treeSimplified.Nodes);
+                var bst = new BinarySearchTree(treeSimplified.Nodes);
 
                 return Ok(bst.FindWithValue(value));
             }
@@ -59,32 +65,27 @@ namespace Builders.Controllers
         public async Task<ActionResult> Post(List<int> values)
         {
             logger.LogInformation("Create a bst and insert into MongoDb");
-            var bst = new BinarySearchTree();
-            foreach (int value in values)
-            {
-                bst.AddNode(value);
-            }
+            var bst = new BinarySearchTree(values);
 
             var simplifiedBst = new SimplifiedBinarySearchTree { Nodes = bst.GetSimplifiedBinarySearchTree() };
-            await repository.AddBinarySearchTree(simplifiedBst);
-            return Ok(bst);
+            await repository.AddSimplifiedBinarySearchTree(simplifiedBst);
+
+            return Ok(simplifiedBst);
         }
 
         [HttpPatch]
         public async Task<ActionResult> Patch(string id, List<int> values)
         {
-            var treeSimplified = await repository.GetBinarySearchTree(id);
+            var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
             logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
             if (treeSimplified is not null)
             {
-                var bst = new BinarySearchTree();
-                bst.AddNode(treeSimplified.Nodes);
+                var bst = new BinarySearchTree(treeSimplified.Nodes);
                 bst.AddNode(values);
 
-                var simplifiedBst = bst.GetSimplifiedBinarySearchTree();
-                treeSimplified.Nodes = simplifiedBst;
+                treeSimplified.Nodes = bst.GetSimplifiedBinarySearchTree(); ;
 
-                await repository.UpdateBinarySearchTree(treeSimplified);
+                await repository.UpdateSimplifiedBinarySearchTree(treeSimplified);
                 logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
 
                 return Ok(treeSimplified);

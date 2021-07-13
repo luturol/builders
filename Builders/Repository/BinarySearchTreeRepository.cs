@@ -18,12 +18,12 @@ namespace Builders.Repository
             collection = database.GetCollection<SimplifiedBinarySearchTree>(settings.Collection);
         }
 
-        public async Task AddBinarySearchTree(SimplifiedBinarySearchTree simplifiedBst)
+        public async Task AddSimplifiedBinarySearchTree(SimplifiedBinarySearchTree simplifiedBst)
         {
             await collection.InsertOneAsync(simplifiedBst);
         }
 
-        public async Task<SimplifiedBinarySearchTree> GetBinarySearchTree(string id)
+        public async Task<SimplifiedBinarySearchTree> GetSimplifiedBinarySearchTree(string id)
         {
             var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(bst => bst.Id, id);
             var tree = await collection.Find(filter).FirstOrDefaultAsync();
@@ -31,7 +31,7 @@ namespace Builders.Repository
             return tree;
         }
 
-        public async Task UpdateBinarySearchTree(SimplifiedBinarySearchTree bst)
+        public async Task UpdateSimplifiedBinarySearchTree(SimplifiedBinarySearchTree bst)
         {
             var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, bst.Id);
 

@@ -10,6 +10,11 @@ namespace Builders.Models
     {
         public Node Root { get; private set; }
 
+        public BinarySearchTree(List<int> nodes)
+        {
+            AddNode(nodes);
+        }
+
         public void AddNode(int value)
         {
             Root = AddNodeRecursive(Root, value);

@@ -4,10 +4,11 @@ using Builders.Models;
 
 namespace Builders.Interfaces
 {
-    public interface IBinarySearchTreeRepository
+    public interface IBinarySearchTreeService
     {
         Task<SimplifiedBinarySearchTree> GetSimplifiedBinarySearchTree(string id);
-        Task AddSimplifiedBinarySearchTree(SimplifiedBinarySearchTree bst);
-        Task UpdateSimplifiedBinarySearchTree(SimplifiedBinarySearchTree bst);
+        Task AddSimplifiedBinarySearchTree(List<int> nodes);
+        Task AddNodesToTree(SimplifiedBinarySearchTree simplifiedBst, List<int> nodes);
+        
     }
 }
