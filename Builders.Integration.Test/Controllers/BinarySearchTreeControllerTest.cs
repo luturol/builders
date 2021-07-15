@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Builders.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Xunit;
@@ -44,7 +45,7 @@ namespace Builders.Integration.Test.Controllers
         }
 
         [Fact]
-        public async Task ShouldBeAbleToGetNoContentByGivingInvalidId()
+        public async Task ShouldBeAbleToGetNoContentByGivingWrongId()
         {
             #region Arrange
             var client = factory.CreateClient();
@@ -62,6 +63,30 @@ namespace Builders.Integration.Test.Controllers
             Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
+
+        [Fact]
+        public async Task ShouldNotBeAbleToGetTreeByGivingInvalidIdFormat()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var fakeId = "asdasdasdas";
+            var expectedStatusCode = (int)HttpStatusCode.BadRequest;
+            #endregion Arrange
+
+            #region Act
+            var response = await client.GetAsync("BinarySearchTree/" + fakeId);
+            var actualStatusCode = (int)response.StatusCode;
+
+            var json = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonConvert.DeserializeObject<ProblemDetails>(json);
+            #endregion Act
+
+            #region Assert            
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            Assert.NotNull(responseObject);            
+            #endregion Assert
+        }
+
         #endregion Get Simplified Binary Search Tree Test
 
         #region Post
@@ -131,15 +156,15 @@ namespace Builders.Integration.Test.Controllers
             #region Arrange
             var client = factory.CreateClient();
             var expectedSimplifiedBst = await AddSimplifiedBst();
-            var expectedStatusCode = (int) HttpStatusCode.NoContent;     
+            var expectedStatusCode = (int)HttpStatusCode.NoContent;
             #endregion Arrange
 
             #region Act
             var response = await client.DeleteAsync("BinarySearchTree/" + expectedSimplifiedBst.Id);
-            var actualStatusCode = (int) response.StatusCode;
+            var actualStatusCode = (int)response.StatusCode;
 
             var responseGet = await client.GetAsync("BinarySearchTree/" + expectedSimplifiedBst.Id);
-            var actualStatusCodeGet = (int) responseGet.StatusCode;
+            var actualStatusCodeGet = (int)responseGet.StatusCode;
             #endregion Act
 
             #region Assert

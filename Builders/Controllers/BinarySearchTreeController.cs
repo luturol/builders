@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using MongoDB.Bson;
 using Builders.Validations;
+using Builders.Extensions;
+using System.Net;
 
 namespace Builders.Controllers
 {
@@ -35,7 +37,7 @@ namespace Builders.Controllers
                 var resultValidation = objectIdValidation.Validate(id);
                 if (!resultValidation.IsValid)
                 {
-                    return BadRequest(resultValidation.Errors);
+                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
                 }
 
                 var tree = await repository.GetSimplifiedBinarySearchTree(id);
