@@ -15,7 +15,7 @@ namespace Builders.Models
             AddNode(nodes);
         }
 
-        public void AddNode(int value)
+        private void AddNode(int value)
         {
             Root = AddNodeRecursive(Root, value);
         }
