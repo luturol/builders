@@ -5,6 +5,7 @@ using Builders.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using MongoDB.Bson;
 
 namespace Builders.Controllers
 {
@@ -29,16 +30,24 @@ namespace Builders.Controllers
         {
             try
             {
-                var tree = await repository.GetSimplifiedBinarySearchTree(id);
-                if (tree is null)
+                if (ObjectId.TryParse(id, out var objectId))
                 {
-                    logger.LogInformation("No tree found with giving id {id}", id);
-                    return NoContent();
+                    var tree = await repository.GetSimplifiedBinarySearchTree(objectId.ToString());
+                    if (tree is null)
+                    {
+                        logger.LogInformation("No tree found with giving id {id}", id);
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return Ok(tree);
+                    }
                 }
                 else
                 {
-                    return Ok(tree);
+                    return BadRequest("Invalid value for Id");
                 }
+
             }
             catch (Exception ex)
             {
@@ -105,7 +114,7 @@ namespace Builders.Controllers
                 if (await service.DeleteSimplifiedBinaryTree(id))
                 {
                     return NoContent();
-                }                    
+                }
                 else
                 {
                     return BadRequest("It was not possible to delete tree by giving id");
