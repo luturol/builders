@@ -12,7 +12,7 @@ namespace Builders.Repository
         private IMongoCollection<SimplifiedBinarySearchTree> collection;
 
         public BinarySearchTreeRepository(IMongoDbSettings settings)
-        {            
+        {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.Database);
             collection = database.GetCollection<SimplifiedBinarySearchTree>(settings.Collection);
@@ -35,7 +35,16 @@ namespace Builders.Repository
         {
             var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, bst.Id);
 
-            await collection.ReplaceOneAsync(filter, bst);            
+            await collection.ReplaceOneAsync(filter, bst);
+        }
+
+        public async Task<bool> DeleteSimplifiedBinaryTreeById(string id)
+        {
+            var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, id);
+
+            var deleteResponse = await collection.DeleteOneAsync(filter);
+
+            return deleteResponse.DeletedCount > 0;
         }
     }
 }

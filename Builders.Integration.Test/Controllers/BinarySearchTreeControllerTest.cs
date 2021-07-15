@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,14 +49,17 @@ namespace Builders.Integration.Test.Controllers
             #region Arrange
             var client = factory.CreateClient();
             var fakeId = "60edef20784d79c6f17e2a9e";
+            var expectedStatusCode = (int)HttpStatusCode.NoContent;
             #endregion Arrange
 
             #region Act
             var response = await client.GetAsync("BinarySearchTree/" + fakeId);
+            var actualStatusCode = (int)response.StatusCode;
             #endregion Act
 
             #region Assert
             response.EnsureSuccessStatusCode();
+            Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
         #endregion Get Simplified Binary Search Tree Test
@@ -115,7 +119,32 @@ namespace Builders.Integration.Test.Controllers
             #region Assert
             response.EnsureSuccessStatusCode();
             Assert.NotNull(actualNode);
-            Assert.Equal(expectedNodeValue, actualNode.Value);            
+            Assert.Equal(expectedNodeValue, actualNode.Value);
+            #endregion Assert
+        }
+        #endregion
+
+        #region Delete Tests
+        [Fact]
+        public async Task ShouldBeAbleToDeleteSimplifiedBstByGivingId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedSimplifiedBst = await AddSimplifiedBst();
+            var expectedStatusCode = (int) HttpStatusCode.NoContent;     
+            #endregion Arrange
+
+            #region Act
+            var response = await client.DeleteAsync("BinarySearchTree/" + expectedSimplifiedBst.Id);
+            var actualStatusCode = (int) response.StatusCode;
+
+            var responseGet = await client.GetAsync("BinarySearchTree/" + expectedSimplifiedBst.Id);
+            var actualStatusCodeGet = (int) responseGet.StatusCode;
+            #endregion Act
+
+            #region Assert
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            Assert.Equal(expectedStatusCode, actualStatusCodeGet);
             #endregion Assert
         }
 

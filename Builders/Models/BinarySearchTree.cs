@@ -12,20 +12,12 @@ namespace Builders.Models
 
         public BinarySearchTree(List<int> nodes)
         {
-            AddNode(nodes);
+            AddNodes(nodes);
         }
 
         private void AddNode(int value)
         {
             Root = AddNodeRecursive(Root, value);
-        }
-
-        public void AddNode(List<int> values)
-        {
-            foreach (int node in values)
-            {
-                AddNode(node);
-            }
         }
 
         private Node AddNodeRecursive(Node node, int value)
@@ -45,6 +37,14 @@ namespace Builders.Models
             }
 
             return node;
+        }
+
+        public void AddNodes(List<int> values)
+        {
+            foreach (int node in values)
+            {
+                AddNode(node);
+            }
         }
 
         public Node FindWithValue(int value)
@@ -72,44 +72,13 @@ namespace Builders.Models
             }
         }
 
-        public List<int> GetSimplifiedBinarySearchTree()
+        private int GetMaxRightRecursive(Node node)
         {
-            List<int> nodes = new List<int>();
-            GetSimplifiedBstRecursive(nodes, Root);
-
-            return nodes;
+            if (node.Right is null)
+                return node.Value;
+            else
+                return GetMaxRightRecursive(node.Right);
         }
-
-        private void GetSimplifiedBstRecursive(List<int> nodes, Node node)
-        {
-            if (node is null) return;
-
-            nodes.Add(node.Value);
-
-            GetSimplifiedBstRecursive(nodes, node.Left);
-            GetSimplifiedBstRecursive(nodes, node.Right);
-        }
-
-        public bool IsBst()
-        {
-            return IsBstRecursive(Root);
-        }
-
-        private bool IsBstRecursive(Node node)
-        {
-            if(node == null)
-            {
-                return true;
-            }
-
-            var minValue = GetMinLeftRecursive(node);
-            var maxValue = GetMaxRightRecursive(node);
-
-            if(node.Value < minValue || node.Value > maxValue)
-                return false;
-            
-            return IsBstRecursive(node.Left) && IsBstRecursive(node.Right);            
-        }   
 
         private int GetMinLeftRecursive(Node node)
         {
@@ -119,12 +88,43 @@ namespace Builders.Models
                 return GetMinLeftRecursive(node.Left);
         }
 
-        private int GetMaxRightRecursive(Node node)
+        public List<int> GetSimplifiedBinarySearchTree()
         {
-            if(node.Right is null)
-                return node.Value;
-            else
-                return GetMaxRightRecursive(node.Right);
+            List<int> nodes = new List<int>();
+            GetSimplifiedBinarySearchTreeRecursive(nodes, Root);
+
+            return nodes;
+        }
+
+        private void GetSimplifiedBinarySearchTreeRecursive(List<int> nodes, Node node)
+        {
+            if (node is null) return;
+
+            nodes.Add(node.Value);
+
+            GetSimplifiedBinarySearchTreeRecursive(nodes, node.Left);
+            GetSimplifiedBinarySearchTreeRecursive(nodes, node.Right);
+        }
+
+        public bool IsBst()
+        {
+            return IsBstRecursive(Root);
+        }
+
+        private bool IsBstRecursive(Node node)
+        {
+            if (node == null)
+            {
+                return true;
+            }
+
+            var minValue = GetMinLeftRecursive(node);
+            var maxValue = GetMaxRightRecursive(node);
+
+            if (node.Value < minValue || node.Value > maxValue)
+                return false;
+
+            return IsBstRecursive(node.Left) && IsBstRecursive(node.Right);
         }
     }
 }

@@ -1,6 +1,6 @@
 using Builders.Interfaces;
 
-namespace Builders.Core
+namespace Builders.Config
 {
     public class BinarySearchTreeDbSettings : IMongoDbSettings
     {

@@ -12,13 +12,16 @@ namespace Builders.Controllers
     [Route("[controller]")]
     public class BinarySearchTreeController : ControllerBase
     {
-        private ILogger<BinarySearchTreeController> logger;
-        private IBinarySearchTreeRepository repository;
+        private readonly ILogger<BinarySearchTreeController> logger;
+        private readonly IBinarySearchTreeRepository repository;
+        private readonly IBinarySearchTreeService service;
         public BinarySearchTreeController(ILogger<BinarySearchTreeController> logger,
+                                          IBinarySearchTreeService service,
                                           IBinarySearchTreeRepository repository)
         {
             this.logger = logger;
             this.repository = repository;
+            this.service = service;
         }
 
         [HttpGet("{id}")]
@@ -81,7 +84,7 @@ namespace Builders.Controllers
             if (treeSimplified is not null)
             {
                 var bst = new BinarySearchTree(treeSimplified.Nodes);
-                bst.AddNode(values);
+                bst.AddNodes(values);
 
                 treeSimplified.Nodes = bst.GetSimplifiedBinarySearchTree(); ;
 
@@ -92,6 +95,27 @@ namespace Builders.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            try
+            {
+                if (await service.DeleteSimplifiedBinaryTree(id))
+                {
+                    return NoContent();
+                }                    
+                else
+                {
+                    return BadRequest("It was not possible to delete tree by giving id");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(ex, $"Error while trying to delete tree by id { id } { ex.Message }");
+                return StatusCode(500, new { message = "An internal error has happend. Try again later." });
+            }
         }
     }
 }
