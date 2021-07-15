@@ -83,7 +83,7 @@ namespace Builders.Integration.Test.Controllers
 
             #region Assert            
             Assert.Equal(expectedStatusCode, actualStatusCode);
-            Assert.NotNull(responseObject);            
+            Assert.NotNull(responseObject);
             #endregion Assert
         }
 
@@ -147,6 +147,33 @@ namespace Builders.Integration.Test.Controllers
             Assert.Equal(expectedNodeValue, actualNode.Value);
             #endregion Assert
         }
+
+        [Fact]
+        public async Task ShouldNotBeAbleToFindNodeInsideTreeByGivingInvalidId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.BadRequest;
+            var invalidId = "asdasdas";
+            var randomValue = 2;
+            #endregion Arrange
+
+            #region Act
+            var response = await client.GetAsync("BinarySearchTree/" + invalidId + "/" + randomValue);
+
+            var json = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonConvert.DeserializeObject<ProblemDetails>(json);
+            var actualStatusCode = responseObject.Status;
+            #endregion Act
+
+            #region Assert
+            Assert.Equal(expectedStatusCode, (int) response.StatusCode);
+            Assert.NotNull(responseObject);
+            Assert.Equal(expectedStatusCode, actualStatusCode);            
+            #endregion Assert
+        }
+
+
         #endregion
 
         #region Delete Tests

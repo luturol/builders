@@ -61,17 +61,32 @@ namespace Builders.Controllers
         [HttpGet("{id}/{value}")]
         public async Task<ActionResult> FindNodeInsideTree(string id, int value)
         {
-            var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
-            logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
-            if (treeSimplified is null)
+            try
             {
-                return NoContent();
-            }
-            else
-            {
-                var bst = new BinarySearchTree(treeSimplified.Nodes);
+                var objectIdValidation = new ObjectIdValidation();
+                var resultValidation = objectIdValidation.Validate(id);
+                if (!resultValidation.IsValid)
+                {
+                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
+                }
 
-                return Ok(bst.FindWithValue(value));
+                var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
+                logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
+                if (treeSimplified is null)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    var bst = new BinarySearchTree(treeSimplified.Nodes);
+
+                    return Ok(bst.FindWithValue(value));
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(ex, $"Error while trying to find node inside tree by id { id } and value { value } { ex.Message }");
+                return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
 
