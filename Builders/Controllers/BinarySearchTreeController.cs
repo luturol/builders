@@ -85,7 +85,7 @@ namespace Builders.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogInformation(ex, $"Error while trying to find node inside tree by id { id } and value { value } { ex.Message }");
+                logger.LogInformation(ex, $"Error while trying to find node inside tree with id { id } and value { value } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
@@ -102,25 +102,41 @@ namespace Builders.Controllers
             return Ok(simplifiedBst);
         }
 
-        [HttpPatch]
+        [HttpPatch("{id}")]
         public async Task<ActionResult> Patch(string id, List<int> values)
         {
-            var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
-            logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
-            if (treeSimplified is not null)
+            try
             {
-                var bst = new BinarySearchTree(treeSimplified.Nodes);
-                bst.AddNodes(values);
+                var objectIdValidation = new ObjectIdValidation();
+                var resultValidation = objectIdValidation.Validate(id);
+                if (!resultValidation.IsValid)
+                {
+                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
+                }
 
-                treeSimplified.Nodes = bst.GetSimplifiedBinarySearchTree(); ;
+                var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
+                logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
+                if (treeSimplified is not null)
+                {
+                    var bst = new BinarySearchTree(treeSimplified.Nodes);
+                    bst.AddNodes(values);
 
-                await repository.UpdateSimplifiedBinarySearchTree(treeSimplified);
-                logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
+                    treeSimplified.Nodes = bst.GetSimplifiedBinarySearchTree(); ;
 
-                return Ok(treeSimplified);
+                    await repository.UpdateSimplifiedBinarySearchTree(treeSimplified);
+                    logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
+
+                    return Ok(treeSimplified);
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(ex, $"Error while trying to patch tree with id { id } and add values { values } { ex.Message }");
+                return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
 
-            return NoContent();
         }
 
         [HttpDelete("{id}")]

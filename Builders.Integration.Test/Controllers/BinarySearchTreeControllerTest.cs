@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Builders.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using MongoDB.Bson;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -167,13 +168,11 @@ namespace Builders.Integration.Test.Controllers
             #endregion Act
 
             #region Assert
-            Assert.Equal(expectedStatusCode, (int) response.StatusCode);
+            Assert.Equal(expectedStatusCode, (int)response.StatusCode);
             Assert.NotNull(responseObject);
-            Assert.Equal(expectedStatusCode, actualStatusCode);            
+            Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
-
-
         #endregion
 
         #region Delete Tests
@@ -199,8 +198,97 @@ namespace Builders.Integration.Test.Controllers
             Assert.Equal(expectedStatusCode, actualStatusCodeGet);
             #endregion Assert
         }
+        #endregion Delete Tests
 
-        #endregion
+        #region Patch Tests
+        [Fact]
+        public async Task ShouldBeAbleToAddMoreNodesToTreeByGivingId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.OK;
+            var expectedSimplifiedBst = await AddSimplifiedBst();
+
+            var expectedNodeValue = 49;
+            var nodes = new List<int> { 45, 46, 90, 89, expectedNodeValue };
+
+            var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
+            #endregion Arrange
+
+            #region Act
+            var response = await client.PatchAsync("BinarySearchTree/" + expectedSimplifiedBst.Id, httpContent);
+            var actualStatusCode = (int)response.StatusCode;
+
+            var json = await response.Content.ReadAsStringAsync();
+            var actualSimplifiedTree = JsonConvert.DeserializeObject<SimplifiedBinarySearchTree>(json);
+
+            var bst = new BinarySearchTree(actualSimplifiedTree.Nodes);
+            var actualNode = bst.FindWithValue(expectedNodeValue);
+            #endregion Act
+
+            #region Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            Assert.NotNull(actualNode);
+            Assert.True(bst.IsBst());
+            Assert.Equal(expectedNodeValue, actualNode.Value);
+            #endregion Assert
+        }
+
+        [Fact]
+        public async Task ShouldNotBeAbleToAddMoreNodesGivingWrongId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.NoContent;
+
+            var newId = new ObjectId().ToString();
+            var nodes = new List<int> { 45, 46, 90, 89, 49 };
+
+            var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
+            #endregion Arrange
+
+            #region Act
+            var response = await client.PatchAsync("BinarySearchTree/" + newId, httpContent);
+            var actualStatusCode = (int)response.StatusCode;
+            #endregion Act
+
+            #region Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            #endregion Assert
+        }
+
+        [Fact]
+        public async Task ShouldNotBeAbleToAddMoreNodesGivingInvalidId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.BadRequest;
+
+            var invalidId = "asdasd";
+            var nodes = new List<int> { 45, 46, 90, 89, 49 };
+
+            var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
+            #endregion Arrange
+
+            #region Act
+            var response = await client.PatchAsync("BinarySearchTree/" + invalidId, httpContent);
+            var actualStatusCode = (int)response.StatusCode;
+
+            var json = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonConvert.DeserializeObject<ProblemDetails>(json);
+            var actualProblemStatusCode = responseObject.Status;
+            #endregion Act
+
+            #region Assert            
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            Assert.NotNull(responseObject);
+            Assert.Equal(expectedStatusCode, actualProblemStatusCode);
+            #endregion Assert
+        }
+
+        #endregion Patch Tests
         private async Task<SimplifiedBinarySearchTree> AddSimplifiedBst()
         {
             var nodes = new List<int> { 3, 2, 4, 5, 6, 7, 9, 44, 10, 1, 0 };
