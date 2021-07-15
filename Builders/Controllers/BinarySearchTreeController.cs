@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using MongoDB.Bson;
+using Builders.Validations;
 
 namespace Builders.Controllers
 {
@@ -30,24 +31,23 @@ namespace Builders.Controllers
         {
             try
             {
-                if (ObjectId.TryParse(id, out var objectId))
+                var objectIdValidation = new ObjectIdValidation();
+                var resultValidation = objectIdValidation.Validate(id);
+                if (!resultValidation.IsValid)
                 {
-                    var tree = await repository.GetSimplifiedBinarySearchTree(objectId.ToString());
-                    if (tree is null)
-                    {
-                        logger.LogInformation("No tree found with giving id {id}", id);
-                        return NoContent();
-                    }
-                    else
-                    {
-                        return Ok(tree);
-                    }
+                    return BadRequest(resultValidation.Errors);
+                }
+
+                var tree = await repository.GetSimplifiedBinarySearchTree(id);
+                if (tree is null)
+                {
+                    logger.LogInformation("No tree found with giving id {id}", id);
+                    return NoContent();
                 }
                 else
                 {
-                    return BadRequest("Invalid value for Id");
+                    return Ok(tree);
                 }
-
             }
             catch (Exception ex)
             {
