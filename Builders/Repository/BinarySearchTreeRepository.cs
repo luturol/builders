@@ -22,6 +22,15 @@ namespace Builders.Repository
         {
             await collection.InsertOneAsync(simplifiedBst);
         }
+        
+        public async Task<bool> DeleteSimplifiedBinaryTreeById(string id)
+        {
+            var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, id);
+
+            var deleteResponse = await collection.DeleteOneAsync(filter);
+
+            return deleteResponse.DeletedCount > 0;
+        }
 
         public async Task<SimplifiedBinarySearchTree> GetSimplifiedBinarySearchTree(string id)
         {
@@ -36,15 +45,6 @@ namespace Builders.Repository
             var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, bst.Id);
 
             await collection.ReplaceOneAsync(filter, bst);
-        }
-
-        public async Task<bool> DeleteSimplifiedBinaryTreeById(string id)
-        {
-            var filter = Builders<SimplifiedBinarySearchTree>.Filter.Eq(e => e.Id, id);
-
-            var deleteResponse = await collection.DeleteOneAsync(filter);
-
-            return deleteResponse.DeletedCount > 0;
         }
     }
 }

@@ -194,8 +194,29 @@ namespace Builders.Integration.Test.Controllers
             #endregion Act
 
             #region Assert
+            response.EnsureSuccessStatusCode();
             Assert.Equal(expectedStatusCode, actualStatusCode);
             Assert.Equal(expectedStatusCode, actualStatusCodeGet);
+            #endregion Assert
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToDeleteGivingWrongId()
+        {
+             #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.NoContent;
+            var wrongId = new ObjectId().ToString();
+            #endregion Arrange
+
+            #region Act
+            var response = await client.DeleteAsync("BinarySearchTree/" + wrongId);
+            var actualStatusCode = (int)response.StatusCode;            
+            #endregion Act
+
+            #region Assert            
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
         #endregion Delete Tests

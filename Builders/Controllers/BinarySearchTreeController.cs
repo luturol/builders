@@ -144,14 +144,16 @@ namespace Builders.Controllers
         {
             try
             {
-                if (await service.DeleteSimplifiedBinaryTree(id))
+                var objectIdValidation = new ObjectIdValidation();
+                var resultValidation = objectIdValidation.Validate(id);
+                if (!resultValidation.IsValid)
                 {
-                    return NoContent();
+                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
                 }
-                else
-                {
-                    return BadRequest("It was not possible to delete tree by giving id");
-                }
+
+                await service.DeleteSimplifiedBinaryTree(id);
+
+                return NoContent();
             }
             catch (Exception ex)
             {
