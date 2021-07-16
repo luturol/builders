@@ -203,7 +203,7 @@ namespace Builders.Integration.Test.Controllers
         [Fact]
         public async Task ShouldBeAbleToDeleteGivingWrongId()
         {
-             #region Arrange
+            #region Arrange
             var client = factory.CreateClient();
             var expectedStatusCode = (int)HttpStatusCode.NoContent;
             var wrongId = new ObjectId().ToString();
@@ -211,7 +211,7 @@ namespace Builders.Integration.Test.Controllers
 
             #region Act
             var response = await client.DeleteAsync("BinarySearchTree/" + wrongId);
-            var actualStatusCode = (int)response.StatusCode;            
+            var actualStatusCode = (int)response.StatusCode;
             #endregion Act
 
             #region Assert            
@@ -219,6 +219,32 @@ namespace Builders.Integration.Test.Controllers
             Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
+
+        [Fact]
+        public async Task ShouldNotBeAbleToDeleteGivingInvalidId()
+        {
+            #region Arrange
+            var client = factory.CreateClient();
+            var expectedStatusCode = (int)HttpStatusCode.BadRequest;
+            var invalidId = "asdasdasdas";
+            #endregion Arrange
+
+            #region Act
+            var response = await client.DeleteAsync("BinarySearchTree/" + invalidId);
+            var actualStatusCode = (int)response.StatusCode;
+
+            var json = await response.Content.ReadAsStringAsync();
+            var actualProblem = JsonConvert.DeserializeObject<ProblemDetails>(json);
+            var actualProblemStatusCode = actualProblem.Status;
+            #endregion Act
+
+            #region Assert                        
+            Assert.Equal(expectedStatusCode, actualStatusCode);
+            Assert.NotNull(actualProblem);
+            Assert.Equal(expectedStatusCode, actualProblemStatusCode);
+            #endregion Assert
+        }
+
         #endregion Delete Tests
 
         #region Patch Tests
@@ -263,14 +289,14 @@ namespace Builders.Integration.Test.Controllers
             var client = factory.CreateClient();
             var expectedStatusCode = (int)HttpStatusCode.NoContent;
 
-            var newId = new ObjectId().ToString();
+            var wrongId = new ObjectId().ToString();
             var nodes = new List<int> { 45, 46, 90, 89, 49 };
 
             var httpContent = new StringContent(JsonConvert.SerializeObject(nodes), Encoding.UTF8, "application/json");
             #endregion Arrange
 
             #region Act
-            var response = await client.PatchAsync("BinarySearchTree/" + newId, httpContent);
+            var response = await client.PatchAsync("BinarySearchTree/" + wrongId, httpContent);
             var actualStatusCode = (int)response.StatusCode;
             #endregion Act
 
