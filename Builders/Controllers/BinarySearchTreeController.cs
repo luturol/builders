@@ -143,7 +143,7 @@ namespace Builders.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogInformation(ex, $"Error while trying to add node with values { values } { ex.Message }");
+                logger.LogInformation(ex, "Error while trying to add node with values {values} { ex.Message }", values, ex.Message);
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
