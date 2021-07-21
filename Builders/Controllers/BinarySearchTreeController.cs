@@ -28,8 +28,9 @@ namespace Builders.Controllers
             this.service = service;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> Get(string id)
+        #region Endpoints
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(string id)
         {
             try
             {
@@ -37,20 +38,13 @@ namespace Builders.Controllers
                 if (invalidObjectValidation is not null)
                     return invalidObjectValidation;
 
-                var tree = await service.GetSimplifiedBinarySearchTree(id);
-                if (tree is null)
-                {
-                    logger.LogInformation("No tree found with giving id {id}", id);
-                    return NoContent();
-                }
-                else
-                {
-                    return Ok(tree);
-                }
+                await service.DeleteSimplifiedBinaryTree(id);
+
+                return NoContent();
             }
             catch (Exception ex)
             {
-                logger.LogInformation(ex, $"Error while trying to get tree by id { id } { ex.Message }");
+                logger.LogInformation(ex, $"Error while trying to delete tree by id { id } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
@@ -82,19 +76,29 @@ namespace Builders.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Post(List<int> values)
+        [HttpGet("{id}")]
+        public async Task<ActionResult> Get(string id)
         {
             try
             {
-                logger.LogInformation("Create a bst and insert into MongoDb");
-                var simplifiedBst = await service.AddSimplifiedBinarySearchTree(values);
+                var invalidObjectValidation = IsValidObjectId(id);
+                if (invalidObjectValidation is not null)
+                    return invalidObjectValidation;
 
-                return CreatedAtAction(nameof(Get), new { id = simplifiedBst.Id }, simplifiedBst);
+                var tree = await service.GetSimplifiedBinarySearchTree(id);
+                if (tree is null)
+                {
+                    logger.LogInformation("No tree found with giving id {id}", id);
+                    return NoContent();
+                }
+                else
+                {
+                    return Ok(tree);
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.LogInformation(ex, $"Error while trying to add node with values { values } { ex.Message }");
+                logger.LogInformation(ex, $"Error while trying to get tree by id { id } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
@@ -112,7 +116,7 @@ namespace Builders.Controllers
                 logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
                 if (treeSimplified is not null)
                 {
-                    var updatedSimplfiedBst = await service.AddNodesToTree(treeSimplified, values);                    
+                    var updatedSimplfiedBst = await service.AddNodesToTree(treeSimplified, values);
                     logger.LogInformation("Updated Tree {treeSimplified}", updatedSimplfiedBst);
 
                     return Ok(updatedSimplfiedBst);
@@ -125,29 +129,27 @@ namespace Builders.Controllers
                 logger.LogInformation(ex, $"Error while trying to patch tree with id { id } and add values { values } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
-
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        [HttpPost]
+        public async Task<ActionResult> Post(List<int> values)
         {
             try
             {
-                var invalidObjectValidation = IsValidObjectId(id);
-                if (invalidObjectValidation is not null)
-                    return invalidObjectValidation;
+                logger.LogInformation("Create a bst and insert into MongoDb");
+                var simplifiedBst = await service.AddSimplifiedBinarySearchTree(values);
 
-                await service.DeleteSimplifiedBinaryTree(id);
-
-                return NoContent();
+                return CreatedAtAction(nameof(Get), new { id = simplifiedBst.Id }, simplifiedBst);
             }
             catch (Exception ex)
             {
-                logger.LogInformation(ex, $"Error while trying to delete tree by id { id } { ex.Message }");
+                logger.LogInformation(ex, $"Error while trying to add node with values { values } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
         }
+        #endregion Endpoints
 
+        #region Auxiliary Methods
         private BadRequestObjectResult IsValidObjectId(string id)
         {
             var objectIdValidation = new ObjectIdValidation();
@@ -162,5 +164,6 @@ namespace Builders.Controllers
                 return null;
             }
         }
+        #endregion Auxiliary Methods
     }
 }
