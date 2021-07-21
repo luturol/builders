@@ -64,17 +64,16 @@ namespace Builders.Controllers
                 if (invalidObjectValidation is not null)
                     return invalidObjectValidation;
 
-                var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
-                logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
+                var treeSimplified = await service.GetSimplifiedBinarySearchTree(id);                                
                 if (treeSimplified is null)
-                {
+                {                    
                     return NoContent();
                 }
                 else
                 {
-                    var bst = new BinarySearchTree(treeSimplified.Nodes);
-
-                    return Ok(bst.FindWithValue(value));
+                    logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);                    
+                    
+                    return Ok(service.FindNodeInsideBst(treeSimplified, value));
                 }
             }
             catch (Exception ex)

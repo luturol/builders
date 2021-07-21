@@ -16,9 +16,16 @@ namespace Builders.Services
             this.repository = repository;
         }
 
-        public async Task<SimplifiedBinarySearchTree> GetSimplifiedBinarySearchTree(string id)
+        public async Task<SimplifiedBinarySearchTree> AddNodesToTree(SimplifiedBinarySearchTree simplifiedBst, List<int> nodes)
         {
-            return await repository.GetSimplifiedBinarySearchTree(id);
+            var bst = simplifiedBst.ToBST();
+            bst.AddNodes(nodes);
+
+            simplifiedBst.Nodes = bst.GetSimplifiedBinarySearchTree();
+
+            await repository.UpdateSimplifiedBinarySearchTree(simplifiedBst);
+
+            return simplifiedBst;
         }
 
         public async Task AddSimplifiedBinarySearchTree(List<int> nodes)
@@ -29,19 +36,19 @@ namespace Builders.Services
             await repository.AddSimplifiedBinarySearchTree(simplifiedBst);
         }
 
-        public async Task AddNodesToTree(SimplifiedBinarySearchTree simplifiedBst, List<int> nodes)
-        {
-            var bst = simplifiedBst.ToBST();
-            bst.AddNodes(nodes);
-
-            simplifiedBst.Nodes = bst.GetSimplifiedBinarySearchTree();
-
-            await repository.UpdateSimplifiedBinarySearchTree(simplifiedBst);
-        }
-
         public async Task<bool> DeleteSimplifiedBinaryTree(string id)
         {
             return await repository.DeleteSimplifiedBinaryTreeById(id);
+        }
+
+        public Node FindNodeInsideBst(SimplifiedBinarySearchTree simplified, int value)
+        {
+            return new BinarySearchTree(simplified.Nodes).FindWithValue(value);
+        }
+
+        public async Task<SimplifiedBinarySearchTree> GetSimplifiedBinarySearchTree(string id)
+        {
+            return await repository.GetSimplifiedBinarySearchTree(id);
         }
     }
 }
