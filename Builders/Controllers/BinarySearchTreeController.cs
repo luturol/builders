@@ -97,7 +97,6 @@ namespace Builders.Controllers
                 logger.LogInformation(ex, $"Error while trying to add node with values { values } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
             }
-
         }
 
         [HttpPatch("{id}")]
@@ -109,19 +108,14 @@ namespace Builders.Controllers
                 if (invalidObjectValidation is not null)
                     return invalidObjectValidation;
 
-                var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
+                var treeSimplified = await service.GetSimplifiedBinarySearchTree(id);
                 logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
                 if (treeSimplified is not null)
                 {
-                    var bst = new BinarySearchTree(treeSimplified.Nodes);
-                    bst.AddNodes(values);
+                    var updatedSimplfiedBst = await service.AddNodesToTree(treeSimplified, values);                    
+                    logger.LogInformation("Updated Tree {treeSimplified}", updatedSimplfiedBst);
 
-                    treeSimplified.Nodes = bst.GetSimplifiedBinarySearchTree(); ;
-
-                    await repository.UpdateSimplifiedBinarySearchTree(treeSimplified);
-                    logger.LogInformation("Updated Tree {treeSimplified}", treeSimplified);
-
-                    return Ok(treeSimplified);
+                    return Ok(updatedSimplfiedBst);
                 }
 
                 return NoContent();
