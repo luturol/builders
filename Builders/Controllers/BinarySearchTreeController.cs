@@ -71,8 +71,7 @@ namespace Builders.Controllers
                 }
                 else
                 {
-                    logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);                    
-                    
+                    logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);                                        
                     return Ok(service.FindNodeInsideBst(treeSimplified, value));
                 }
             }
@@ -86,13 +85,10 @@ namespace Builders.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(List<int> values)
         {
-            logger.LogInformation("Create a bst and insert into MongoDb");
-            var bst = new BinarySearchTree(values);
+            logger.LogInformation("Create a bst and insert into MongoDb");            
+            var simplifiedBst = await service.AddSimplifiedBinarySearchTree(values);            
 
-            var simplifiedBst = new SimplifiedBinarySearchTree { Nodes = bst.GetSimplifiedBinarySearchTree() };
-            await repository.AddSimplifiedBinarySearchTree(simplifiedBst);
-
-            return Ok(simplifiedBst);
+            return CreatedAtAction(nameof(Get), new { id = simplifiedBst.Id },  simplifiedBst);
         }
 
         [HttpPatch("{id}")]

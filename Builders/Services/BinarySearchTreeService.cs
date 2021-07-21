@@ -28,12 +28,14 @@ namespace Builders.Services
             return simplifiedBst;
         }
 
-        public async Task AddSimplifiedBinarySearchTree(List<int> nodes)
+        public async Task<SimplifiedBinarySearchTree> AddSimplifiedBinarySearchTree(List<int> nodes)
         {
             var bst = new BinarySearchTree(nodes);
 
             var simplifiedBst = new SimplifiedBinarySearchTree { Nodes = bst.GetSimplifiedBinarySearchTree() };
             await repository.AddSimplifiedBinarySearchTree(simplifiedBst);
+
+            return simplifiedBst;
         }
 
         public async Task<bool> DeleteSimplifiedBinaryTree(string id)
