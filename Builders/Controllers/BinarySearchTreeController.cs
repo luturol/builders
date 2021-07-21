@@ -64,14 +64,14 @@ namespace Builders.Controllers
                 if (invalidObjectValidation is not null)
                     return invalidObjectValidation;
 
-                var treeSimplified = await service.GetSimplifiedBinarySearchTree(id);                                
+                var treeSimplified = await service.GetSimplifiedBinarySearchTree(id);
                 if (treeSimplified is null)
-                {                    
+                {
                     return NoContent();
                 }
                 else
                 {
-                    logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);                                        
+                    logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
                     return Ok(service.FindNodeInsideBst(treeSimplified, value));
                 }
             }
@@ -85,10 +85,19 @@ namespace Builders.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(List<int> values)
         {
-            logger.LogInformation("Create a bst and insert into MongoDb");            
-            var simplifiedBst = await service.AddSimplifiedBinarySearchTree(values);            
+            try
+            {
+                logger.LogInformation("Create a bst and insert into MongoDb");
+                var simplifiedBst = await service.AddSimplifiedBinarySearchTree(values);
 
-            return CreatedAtAction(nameof(Get), new { id = simplifiedBst.Id },  simplifiedBst);
+                return CreatedAtAction(nameof(Get), new { id = simplifiedBst.Id }, simplifiedBst);
+            }
+            catch(Exception ex)
+            {
+                logger.LogInformation(ex, $"Error while trying to add node with values { values } { ex.Message }");
+                return StatusCode(500, new { message = "An internal error has happend. Try again later." });
+            }
+
         }
 
         [HttpPatch("{id}")]
