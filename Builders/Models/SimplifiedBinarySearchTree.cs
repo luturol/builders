@@ -10,6 +10,6 @@ namespace Builders.Models
         [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public List<int> Nodes { get; set; }            
+        public List<int> Nodes { get; set; } = new List<int>();       
     }
 }
