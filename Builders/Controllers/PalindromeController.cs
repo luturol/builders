@@ -15,8 +15,8 @@ namespace Builders.Controllers
             this.logger = logger;
         }
 
-        [HttpPost]
-        public ActionResult Post(string word)
+        [HttpGet]
+        public ActionResult Get(string word)
         {
             word = word.ToLower();
             char[] wordChar = word.ToCharArray();
