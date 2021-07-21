@@ -41,9 +41,16 @@ namespace Builders.Models
 
         public void AddNodes(List<int> values)
         {
-            foreach (int node in values)
+            if (values is null)
             {
-                AddNode(node);
+                return;
+            }
+            else
+            {
+                foreach (int node in values)
+                {
+                    AddNode(node);
+                }
             }
         }
 
