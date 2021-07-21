@@ -33,14 +33,11 @@ namespace Builders.Controllers
         {
             try
             {
-                var objectIdValidation = new ObjectIdValidation();
-                var resultValidation = objectIdValidation.Validate(id);
-                if (!resultValidation.IsValid)
-                {
-                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
-                }
+                var invalidObjectValidation = IsValidObjectId(id);
+                if (invalidObjectValidation is not null)
+                    return invalidObjectValidation;
 
-                var tree = await repository.GetSimplifiedBinarySearchTree(id);
+                var tree = await service.GetSimplifiedBinarySearchTree(id);
                 if (tree is null)
                 {
                     logger.LogInformation("No tree found with giving id {id}", id);
@@ -63,12 +60,9 @@ namespace Builders.Controllers
         {
             try
             {
-                var objectIdValidation = new ObjectIdValidation();
-                var resultValidation = objectIdValidation.Validate(id);
-                if (!resultValidation.IsValid)
-                {
-                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
-                }
+                var invalidObjectValidation = IsValidObjectId(id);
+                if (invalidObjectValidation is not null)
+                    return invalidObjectValidation;
 
                 var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
                 logger.LogInformation("Got the tree {treeSimplified}", treeSimplified);
@@ -107,12 +101,9 @@ namespace Builders.Controllers
         {
             try
             {
-                var objectIdValidation = new ObjectIdValidation();
-                var resultValidation = objectIdValidation.Validate(id);
-                if (!resultValidation.IsValid)
-                {
-                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
-                }
+                var invalidObjectValidation = IsValidObjectId(id);
+                if (invalidObjectValidation is not null)
+                    return invalidObjectValidation;
 
                 var treeSimplified = await repository.GetSimplifiedBinarySearchTree(id);
                 logger.LogInformation("Got the tree and will add another values to it with tree is not null {treeSimplified}", treeSimplified);
@@ -144,12 +135,9 @@ namespace Builders.Controllers
         {
             try
             {
-                var objectIdValidation = new ObjectIdValidation();
-                var resultValidation = objectIdValidation.Validate(id);
-                if (!resultValidation.IsValid)
-                {
-                    return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
-                }
+                var invalidObjectValidation = IsValidObjectId(id);
+                if (invalidObjectValidation is not null)
+                    return invalidObjectValidation;
 
                 await service.DeleteSimplifiedBinaryTree(id);
 
@@ -159,6 +147,21 @@ namespace Builders.Controllers
             {
                 logger.LogInformation(ex, $"Error while trying to delete tree by id { id } { ex.Message }");
                 return StatusCode(500, new { message = "An internal error has happend. Try again later." });
+            }
+        }
+
+        private BadRequestObjectResult IsValidObjectId(string id)
+        {
+            var objectIdValidation = new ObjectIdValidation();
+            var resultValidation = objectIdValidation.Validate(id);
+            if (!resultValidation.IsValid)
+            {
+                resultValidation.Errors.ForEach(e => logger.LogInformation($"Invalid value for {e.PropertyName } error message { e.ErrorMessage }"));
+                return BadRequest(resultValidation.ToProblemDetails(HttpStatusCode.BadRequest));
+            }
+            else
+            {
+                return null;
             }
         }
     }
