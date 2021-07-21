@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Builders.Models;
 using Builders.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using MongoDB.Bson;
 using Builders.Validations;
 using Builders.Extensions;
 using System.Net;
@@ -17,14 +15,11 @@ namespace Builders.Controllers
     public class BinarySearchTreeController : ControllerBase
     {
         private readonly ILogger<BinarySearchTreeController> logger;
-        private readonly IBinarySearchTreeRepository repository;
         private readonly IBinarySearchTreeService service;
         public BinarySearchTreeController(ILogger<BinarySearchTreeController> logger,
-                                          IBinarySearchTreeService service,
-                                          IBinarySearchTreeRepository repository)
+                                          IBinarySearchTreeService service)
         {
             this.logger = logger;
-            this.repository = repository;
             this.service = service;
         }
 
@@ -122,7 +117,7 @@ namespace Builders.Controllers
                     return Ok(updatedSimplfiedBst);
                 }
 
-                return NoContent();
+                return NotFound();
             }
             catch (Exception ex)
             {

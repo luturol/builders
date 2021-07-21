@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Net;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;

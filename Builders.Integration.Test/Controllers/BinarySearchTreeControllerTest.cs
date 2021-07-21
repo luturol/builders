@@ -287,7 +287,7 @@ namespace Builders.Integration.Test.Controllers
         {
             #region Arrange
             var client = factory.CreateClient();
-            var expectedStatusCode = (int)HttpStatusCode.NoContent;
+            var expectedStatusCode = (int)HttpStatusCode.NotFound;
 
             var wrongId = new ObjectId().ToString();
             var nodes = new List<int> { 45, 46, 90, 89, 49 };
@@ -301,7 +301,6 @@ namespace Builders.Integration.Test.Controllers
             #endregion Act
 
             #region Assert
-            response.EnsureSuccessStatusCode();
             Assert.Equal(expectedStatusCode, actualStatusCode);
             #endregion Assert
         }
